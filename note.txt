@@ -54,3 +54,5 @@ Planning :
     - Suggestion de planning en fonction de la semaine à laquelle un formateur est disponible durant la 
     durée nécessaire à la formation pendant toute la semaine
     - Le client pour choisir de prendre la suggestion ou de créer son planning lui-même
+
+    fjdksjfsk
