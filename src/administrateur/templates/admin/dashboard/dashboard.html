@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Titre principal -->
+    <h3>Proforma </h3>
+
+    <!-- Formulaire de filtre -->
+    <form method="get" action="" class="mb-4">
+        <div class="row mb-3">
+            <div class="col-md-6 col-sm-12">
+                <label for="mois" class="form-label">Mois :</label>
+                <select name="mois" id="mois" class="form-select">
+                    {% for i in mois_range %}
+                        <option value="{{ i }}" {% if i == mois %}selected{% endif %}>
+                            {{ i }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <label for="annee" class="form-label">Année :</label>
+                <select name="annee" id="annee" class="form-select">
+                    {% for i in annee_range %}
+                        <option value="{{ i }}" {% if i == annee %}selected{% endif %}>
+                            {{ i }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+    </form>
+
+    <!-- Affichage des statistiques -->
+    <div class="mb-4">
+        <h4 class="fw-bold">Génération des inscriptions :</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Générer inscrit :</strong> {{ generer_inscrit }} | <strong>Converti :</strong> {{ convertit_inscrit }}</p>
+                <p><strong>Inscrit :</strong> {{ total_inscrit }} Ar</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Générer non inscrit :</strong> {{ generer_non_inscrit }} | <strong>Converti :</strong> {{ convertit_non_inscrit }}</p>
+                <p><strong>Non inscrit :</strong> {{ total_non_inscrit }} Ar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total général -->
+    <div class="alert alert-info">
+        <h4><strong>Total généré :</strong> {{ total_generer }}</h4>
+        <h4><strong>Total général :</strong> {{ somme_total }} Ar</h4>
+    </div>
+</div>
+{% endblock %}

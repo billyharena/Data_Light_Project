@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Proformas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Formulaire de filtre -->
+    <form method="get" class="filter-form mb-4">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="search" class="form-label">Recherche :</label>
+                <input type="text" id="search" name="search" class="form-control" placeholder="Nom, prénom ou entreprise" value="{{ search_query }}">
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <label for="num" class="form-label">Numéro proforma :</label>
+                <input type="number" id="num" name="num" class="form-control" placeholder="Numéro de proforma" value="{{ num }}">
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label for="date_start" class="form-label">Date début :</label>
+                <input type="date" id="date_start" name="date_start" class="form-control" value="{{ date_start }}">
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label for="date_end" class="form-label">Date fin :</label>
+                <input type="date" id="date_end" name="date_end" class="form-control" value="{{ date_end }}">
+            </div>
+
+            <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Liste des proformas (utilisateurs inscrits) -->
+    <h2>Liste des Proformas (Utilisateur Inscrit)</h2>
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Date de création</th>
+                <th>Client</th>
+                <th>Type client</th>
+                <th>Coût total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proforma in proforma_inscrit %}
+            <tr>
+                <td>{{ proforma.id }}</td>
+                <td>{{ proforma.date_creation }}</td>
+                <td>{{ proforma.idclient.nom }}</td>
+                <td>
+                    {% for role_id, role_name in proforma.idclient.ROLE_UTILISATEUR_CHOICES %}
+                        {% if proforma.idclient.role_utilisateur == role_id %}
+                            {{ role_name }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ proforma.cout_total }} Ar</td>
+                <td><a href="{% url 'modification_proforma_inscrit' proforma.id %}" class="btn btn-info btn-sm">Voir</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Aucun proforma</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Liste des proformas (utilisateurs non inscrits) -->
+    <h2>Liste des Proformas (Utilisateur Non Inscrit)</h2>
+    <a href="{% url 'inscription_proforma_non_inscrit' %}" class="btn btn-success mb-3">Inscrire un proforma non utilisateur</a>
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Date de création</th>
+                <th>Entreprise</th>
+                <th>Coût total</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proforma in proforma_non_inscrit %}
+            <tr>
+                <td>{{ proforma.id }}</td>
+                <td>{{ proforma.date_creation_pf }}</td>
+                <td>{{ proforma.nom_entreprise }}</td>
+                <td>{{ proforma.cout_total }} Ar</td>
+                <td><a href="{% url 'modification_proforma_non_inscrit' proforma.id %}" class="btn btn-info btn-sm">Voir</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Aucun proforma</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

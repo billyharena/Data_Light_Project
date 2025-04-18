@@ -1,0 +1,78 @@
+class DisponibiliteFormateurAPIView(APIView):
+    """
+    API pour obtenir les disponibilités des formateurs sur un module et un mois donnés.
+    """
+
+    def get(self, request, module_id, mois):
+        try:
+            # Vérification du format de la date
+            try:
+                annee, mois = map(int, mois.split("-"))
+            except ValueError:
+                return Response({"error": "Format du mois invalide, attendu: YYYY-MM"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Récupérer la durée du module
+            module = get_object_or_404(Module, id=module_id)
+            duree_module = module.duree
+
+            # Récupérer les formateurs compétents pour ce module
+            formateurs_ids = Formateur_competence.objects.filter(idmodule=module_id).values_list('idformateur', flat=True)
+            if not formateurs_ids:
+                return Response({"message": "Aucun formateur trouvé pour ce module."}, status=status.HTTP_404_NOT_FOUND)
+
+            # Récupérer les formateurs
+            formateurs = CustomUser.objects.filter(id__in=formateurs_ids)
+
+            # Dictionnaire pour stocker les disponibilités par formateur
+            indisponibilites_par_formateur = []
+
+            for formateur in formateurs:
+                # Récupérer les créneaux occupés du formateur pour le mois donné
+                all_formations = PlanningFormation.objects.filter(
+                    idformateur=formateur,
+                    dateFormation__year=annee,
+                    dateFormation__month=mois
+                ).values('dateFormation', 'heureDebFormation', 'heureFinFormation')
+
+                # Regrouper les périodes occupées par date
+                busy_periods = defaultdict(set)
+                for formation in all_formations:
+                    date = formation['dateFormation']
+                    start_time = formation['heureDebFormation']
+                    end_time = formation['heureFinFormation']
+
+                    # Vérification matin
+                    if self.time_overlap(start_time, end_time, time(8, 0), time(12, 0)):
+                        busy_periods[date].add('morning')
+
+                    # Vérification après-midi
+                    if self.time_overlap(start_time, end_time, time(13, 0), time(17, 0)):
+                        busy_periods[date].add('afternoon')
+
+                # Génération des créneaux occupés
+                merged_formations = []
+                for date, periods in busy_periods.items():
+                    if 'morning' in periods:
+                        merged_formations.append({
+                            'dateFormation': date,
+                            'heureDebFormation': '08:00:00',
+                            'heureFinFormation': '12:00:00'
+                        })
+                    if 'afternoon' in periods:
+                        merged_formations.append({
+                            'dateFormation': date,
+                            'heureDebFormation': '13:00:00',
+                            'heureFinFormation': '17:00:00'
+                        })
+
+                # Stocker les disponibilités du formateur
+                indisponibilites_par_formateur.append({
+                    "idformateur": formateur.id,
+                    "duree_module": duree_module,
+                    "indisponibilites": merged_formations
+                })
+
+            return Response(indisponibilites_par_formateur, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

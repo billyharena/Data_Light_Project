@@ -1,0 +1,56 @@
+- Création d'un modèle utilisateur personnalisé : OK
+- Système login/logout admin : OK
+- Système inscription 
+    admin(inscrire admin selon role
+        - superadmin : oui
+        - admin : oui
+        - formateur : non) :
+Modification :
+	- client : no date naissance et adresse, cin pour entreprise
+	- liste module : bug prix; durée en h;
+	- proforma : avant d'ajouter; voir pour pouvoir modifier puis ajouter, durée 2h min
+	- planning : pc disponible à prendre en compte
+
+Modification proforma_non_inscrit:
+    - Bug au niveau de extra
+        - value None
+
+Validation proforma(client connecté):
+    - Bon commande
+    - Planning
+    - Facture
+    
+Facture en état "Bon de commande" avant planning
+
+Planning client :
+    - demander au client si il veut que la formation se déroule :
+        - Temps plein(08h00 - 17h00)
+        - Temps partiel(matin ou après-midi)
+    - En fonction de son choix, donner les dates disponible pour cela
+    - Si formation hors durée de travail(08h00 - 17h00)
+        - Demander une formation exceptionnelle(l'admin donne le planning)
+    - Mettre en place un système pour calculer la distance entre deux points(lieu de formation 1 et lieu de formation 2)
+    - Calculer le temps pour parcourir cette distance
+
+Proforma et Facture côté client :
+	- Voir liste des proformas demandés ?
+	- Voir liste des factures
+		- Etat :
+			- pas encore payé
+			- en cours
+	- Pour facture :
+        - Paiement :
+            - FMFP
+            - Fond propre
+
+
+Modification Landing page:
+	- Changer la première section en insérant le slogan ainsi que l'effet cliquer sur le carré et retourner pour voir les valeurs de l'entreprise
+	- Juste à côté, mettre les preuves +70 entreprises et +1000 formé
+	- Navbar : agrandir un peu le logo
+
+
+Planning :
+    - Suggestion de planning en fonction de la semaine à laquelle un formateur est disponible durant la 
+    durée nécessaire à la formation pendant toute la semaine
+    - Le client pour choisir de prendre la suggestion ou de créer son planning lui-même

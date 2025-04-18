@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifer Formation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Modifer une Formation</h1>
+
+    <form action="{% url 'modifier_formation' id=formation.id %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="formation" class="form-label">Formation</label>
+            <input type="text" name="formation" id="formation" class="form-control" value="{{ formation.formation }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="img" class="form-label">Image</label>
+            {% if formation.img %}
+                <div class="mb-2">
+                    <img src="{{ formation.img.url }}" class="img-fluid" width="200" alt="Image de la formation">
+                </div>
+            {% endif %}
+            <input type="file" name="img" id="img" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control" 
+                     rows="4" >{{ formation.descriptions|default:'' }}</textarea>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Modifier</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    CKEDITOR.replace('description', {
+        toolbar: [
+            ['Styles', 'Format'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['Image', 'Table'],
+            ['RemoveFormat', 'Source']
+        ],
+        contentsCss: [
+            "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap",
+            "/static/css/custom_ckeditor.css"  // Fichier CSS pour Gotham
+        ],
+        font_names: 'IBM Plex Mono/IBM Plex Mono; Gotham/Gotham; Arial/Arial; Verdana/Verdana;',
+        stylesSet: [
+            { name: 'IBM Plex Mono', element: 'p', attributes: { 'class': 'ibm-plex-mono' } },
+            { name: 'Gotham', element: 'p', attributes: { 'class': 'gotham' } }
+        ],
+        format_tags: 'h1;h2;h3;p',
+        height: 300
+    });
+</script>
+
+{% endblock %}

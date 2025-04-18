@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Formations{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Liste des Formations</h1>
+
+    <div class="mb-3 text-end">
+        <a href="{% url 'inscription_formation' %}" class="btn btn-primary">Ajouter une formation</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Formation</th>
+                    <th>Image</th>
+                    <th>Disponibilité</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for formation in formation %}
+                <tr>
+                    <td>{{ formation.formation }}</td>
+                    <td>
+                        <img src="{{ formation.img.url }}" width="50" height="50" class="img-thumbnail" alt="Image formation">
+                    </td>
+                    <td>
+                        {% if formation.disponibilite %}
+                            <span class="badge bg-success">Disponible</span>
+                        {% else %}
+                            <span class="badge bg-danger">Non disponible</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'modifier_formation' id=formation.id %}" class="btn btn-sm btn-info">Voir</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Aucune formation disponible</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

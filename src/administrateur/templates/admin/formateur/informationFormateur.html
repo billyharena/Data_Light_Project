@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier Formateur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Modifier Formateur</h2>
+    <a href="{% url 'formateur_competence' id=admin.id %}" class="btn btn-secondary mb-3">Ajouter compétence</a>
+    
+    <form action="{% url 'modifier_formateur' id=admin.id %}" method="post">
+        {% csrf_token %}
+        
+        <!-- Informations sur l'utilisateur -->
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" name="nom" id="nom" class="form-control" value="{{ admin.nom }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" name="prenom" id="prenom" class="form-control" value="{{ admin.prenom }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" value="{{ admin.email }}" required>
+        </div>
+
+        <!-- Informations sur DetailAdmin -->
+        <div class="mb-3">
+            <label for="adresse" class="form-label">Adresse</label>
+            <input type="text" name="adresse" id="adresse" class="form-control" value="{{ detail_admin.adresse|default:'' }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact</label>
+            <input type="text" name="contact" id="contact" class="form-control" value="{{ detail_admin.contact|default:'' }}">
+        </div>
+        <div class="mb-3">
+            <label for="date_debut" class="form-label">Date de début</label>
+            <input type="date" name="date_debut" id="date_debut" class="form-control" value="{{ detail_admin.date_debut|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="date_naissance" class="form-label">Date de naissance</label>
+            <input type="date" name="date_naissance" id="date_naissance" class="form-control" value="{{ detail_admin.date_naissance|date:'Y-m-d'|default:'' }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe</label>
+            <select name="sexe" id="sexe" class="form-select" required>
+                <option value="h" {% if detail_admin and detail_admin.sexe == 1 %}selected{% endif %}>Homme</option>
+                <option value="f" {% if detail_admin and detail_admin.sexe == 2 %}selected{% endif %}>Femme</option>
+            </select>
+        </div>
+
+        <div class="mb-3 form-check">
+            <label for="is_active" class="form-check-label">Actif</label>
+            <input type="checkbox" name="is_active" id="is_active" class="form-check-input" {% if formateur.is_active %}checked{% endif %} value="True">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Modifier</button>
+    </form>
+</div>
+{% endblock %}

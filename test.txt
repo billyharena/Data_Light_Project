@@ -1,0 +1,111 @@
+Facture inscrit :
+{
+    "idclient": 5,
+    "reduction": 50000,
+    "paiement": 300000,
+    "etat": 0,
+    "details": [
+        {
+            "idmodule": 2,
+            "prix_unitaire": 200000,
+            "quantite": 1,
+            "duree_seance": 4,
+            "nbr_seance": 6
+        },
+        {
+            "idmodule": 2,
+            "prix_unitaire": 150000,
+            "quantite": 1,
+            "duree_seance": 3,
+            "nbr_seance": 4
+        }
+    ]
+}
+
+
+Facture non inscrit :
+{
+    "nom": "Rakoto",
+    "prenom": "Jean",
+    "email": "jean.rakoto@example.com",
+    "lieu_formation": "Antananarivo",
+    "pu_pc": 50000,
+    "etat": 0,
+    "paiement": 200000,
+    "details": [
+        {
+            "idmodule": 2,
+            "prix_unitaire": 150000,
+            "quantite": 1,
+            "duree_seance": 3.5,
+            "nbr_seance": 5
+        },
+        {
+            "idmodule": 2,
+            "prix_unitaire": 100000,
+            "quantite": 1,
+            "duree_seance": 2,
+            "nbr_seance": 3
+        }
+    ]
+}
+
+Proforma inscrit :
+{
+    "id_createur": 1,
+    "idclient": 3,
+    "lieu_formation": "Antananarivo-Centre ville",
+    "pu_pc": 50000,
+    "etat": 0,
+    "reduction": 10,
+    "details": [
+        {
+            "idmodule": 2,
+            "prix_unitaire": 150000,
+            "quantite": 2,
+            "duree_seance": 3.5,
+            "nbr_seance": 5
+        },
+        {
+            "idmodule": 2,
+            "prix_unitaire": 120000,
+            "quantite": 1,
+            "duree_seance": 2,
+            "nbr_seance": 3
+        }
+    ]
+}
+
+Proforma non inscrit :
+{
+    "id_createur": 1,
+    "nom": "Doe",
+    "prenom": "John",
+    "nom_entreprise": "Tech Solutions",
+    "adresse_entreprise": "123 Rue des Startups, Antananarivo",
+    "date_creation": "2025-02-16",
+    "contact": "+261320000000",
+    "nif": "1234567890",
+    "stat": "987654321",
+    "rcs": "RCS123456",
+    "cnaps": "CNAPS56789",
+    "lieu_formation": "Antananarivo-Centre ville",
+    "pu_pc": 50000,
+    "etat": 0,
+    "details": [
+        {
+            "idmodule": 2,
+            "prix_unitaire": 150000,
+            "quantite": 2,
+            "duree_seance": 3.5,
+            "nbr_seance": 5
+        },
+        {
+            "idmodule": 2,
+            "prix_unitaire": 120000,
+            "quantite": 1,
+            "duree_seance": 2,
+            "nbr_seance": 3
+        }
+    ]
+}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des factures{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Formulaire de filtrage -->
+    <form method="get" class="filter-form mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="search" class="form-label">Recherche :</label>
+                <input type="text" id="search" name="search" class="form-control" placeholder="Nom, prénom ou entreprise" value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <label for="num" class="form-label">Numéro facture :</label>
+                <input type="number" id="num" name="num" class="form-control" value="{{ num }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_start" class="form-label">Date début :</label>
+                <input type="date" id="date_start" name="date_start" class="form-control" value="{{ date_start }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_end" class="form-label">Date fin :</label>
+                <input type="date" id="date_end" name="date_end" class="form-control" value="{{ date_end }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Filtrer</button>
+    </form>
+
+    <!-- Liste des factures utilisateurs inscrits -->
+    <h2 class="mb-4">Liste des factures (utilisateur inscrit)</h2>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Date de création</th>
+                <th>Client</th>
+                <th>Type client</th>
+                <th>Coût total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for facture in facture_inscrit %}
+            <tr>
+                <td>{{ facture.id }}</td>
+                <td>{{ facture.date_creation }}</td>
+                <td>{{ facture.idclient.nom }}</td>
+                <td>
+                    {% for role_id, role_name in facture.idclient.ROLE_UTILISATEUR_CHOICES %}
+                        {% if facture.idclient.role_utilisateur == role_id %}
+                            {{ role_name }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ facture.cout_total }} Ar</td>
+                <td><a href="{% url 'voir_facture_inscrit' facture.id %}" class="btn btn-info btn-sm">Voir</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Aucune facture</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Liste des factures utilisateurs non inscrits -->
+    <h2 class="mb-4">Liste des factures (utilisateur non inscrit)</h2>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Date de création</th>
+                <th>Entreprise</th>
+                <th>Coût total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for facture in facture_non_inscrit %}
+            <tr>
+                <td>{{ facture.id }}</td>
+                <td>{{ facture.date_creation_pf }}</td>
+                <td>{{ facture.nom_entreprise }}</td>
+                <td>{{ facture.cout_total }} Ar</td>
+                <td><a href="{% url 'voir_facture_non_inscrit' facture.id %}" class="btn btn-info btn-sm">Voir</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Aucune facture</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

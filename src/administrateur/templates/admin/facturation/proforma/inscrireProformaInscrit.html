@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription Proforma Inscrit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Inscription Proforma Inscrit</h1>
+
+    {% if errors %}
+    <div class="alert alert-danger">
+        {% for field, error_list in errors.items %}
+            <p><strong>{{ field }}:</strong> {{ error_list.0 }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form action="{% url 'inscription_proforma_inscrit' client.id %}" method="post">
+        {% csrf_token %}
+
+        <!-- Informations sur l'entreprise -->
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="extra" class="form-label">Région de formation</label>
+                <select name="extra" id="extra" class="form-select" required onchange="toggleDetails()">
+                    {% for value, label in detail_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="d-none" id="tana-local">
+            <div class="mb-3">
+                <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                <input type="number" name="nbr_location_pc" id="nbr_location_pc" class="form-control">
+            </div>
+        </div>
+
+        <!-- Informations de formation -->
+        <div class="d-none" id="tana-non-local">
+            <div class="mb-3">
+                <label for="lieu_formation" class="form-label">Lieu de formation</label>
+                <input type="text" name="lieu_formation" id="lieu_formation" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                <input type="number" name="nbr_location_pc" id="nbr_location_pc" class="form-control">
+            </div>
+        </div>
+
+        <div class="d-none" id="region">
+            <div class="mb-3">
+                <label for="lieu_formation" class="form-label">Lieu de formation</label>
+                <input type="text" name="lieu_formation" id="lieu_formation" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="nbr_frais_restauration" class="form-label">Nombre de restaurations</label>
+                <input type="number" name="nbr_frais_restauration" id="nbr_frais_restauration" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="hebergement" class="form-label">Jour d'hébergement</label>
+                <input type="number" name="hebergement" id="hebergement" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="pu_hebergement" class="form-label">PU hébergement</label>
+                <input type="number" name="pu_hebergement" id="pu_hebergement" class="form-control">
+            </div>
+        </div>  
+
+        <!-- Modules et détails -->
+        <h2>Modules et détails</h2>
+        <div id="details-container">
+            <div class="detail-item mb-3">
+                <label for="module" class="form-label">Module</label>
+                <select name="module" class="form-select" required>
+                    {% for module in modules %}
+                        <option value="{{ module.id }}">{{ module }}</option>
+                    {% endfor %}
+                </select>
+                <label for="quantite" class="form-label">Nombre de personne</label>
+                <input type="number" name="quantite" class="form-control" required>
+                <label for="duree_seance" class="form-label">Durée (heures)</label>
+                <input type="time" name="duree_seance" class="form-control">
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="add-detail">Ajouter un module</button>
+        <button type="button" class="btn btn-danger" id="delete-detail">Supprimer un module</button>
+
+        <br><br>
+
+        <button type="submit" class="btn btn-primary">Demander Proforma</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('add-detail').addEventListener('click', function () {
+        const container = document.getElementById('details-container');
+        const detailItem = document.querySelector('.detail-item').cloneNode(true);
+        detailItem.querySelectorAll('input, select').forEach(input => input.value = '');
+        container.appendChild(detailItem);
+    });
+
+    document.getElementById('delete-detail').addEventListener('click', function () {
+        const container = document.getElementById('details-container');
+        const detailItems = container.querySelectorAll('.detail-item');
+        if (detailItems.length > 1) {
+            container.removeChild(detailItems[detailItems.length - 1]);
+        } else {
+            alert('Il doit y avoir au moins un module !');
+        }
+    });
+
+    function toggleDetails() {
+        const extra = document.getElementById('extra').value;
+        document.getElementById('tana-local').classList.toggle('d-none', extra != 1);
+        document.getElementById('tana-non-local').classList.toggle('d-none', extra == 1 || extra == 4);
+        document.getElementById('region').classList.toggle('d-none', extra != 4);
+    }
+</script>
+{% endblock %}

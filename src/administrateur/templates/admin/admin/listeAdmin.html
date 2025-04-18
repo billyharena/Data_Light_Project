@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Liste des Admins{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Liste des Admins</h2>
+    
+    <div class="text-end mb-3">
+        <a href="{% url 'inscription_admin' %}" class="btn btn-primary">Inscrire un admin</a>
+    </div>
+    <form method="get" class="filter-form mb-4">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="search" class="form-label">Recherche :</label>
+                <input type="text" id="search" name="search" class="form-control" placeholder="Nom, prénom" value="{{ search_query }}">
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label for="role" class="form-label">Rôle admin</label>
+                <select name="role" id="role" class="form-select">
+                    <option value="" disabled selected>Choisir...</option>
+                    <option value="s">Super Admin</option>
+                    <option value="a">Admin</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 mb-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Date de création</th>
+                <th>Rôle utilisateur</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for admin in admin %}
+            <tr>
+                <td>{{ admin.nom }}</td>
+                <td>{{ admin.prenom }}</td>
+                <td>{{ admin.email }}</td>
+                <td>{{ admin.date_creation }}</td>
+                <td>
+                    {% for role_id, role_name in admin.ROLE_UTILISATEUR_CHOICES %}
+                        {% if admin.role_utilisateur == role_id %}
+                            {{ role_name }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'modifier_admin' id=admin.id %}" class="btn btn-sm btn-info">Voir</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">Aucun admin trouvé</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

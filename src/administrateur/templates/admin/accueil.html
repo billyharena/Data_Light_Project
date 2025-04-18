@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Bienvenue, {{ user.nom }} {{ user.prenom }}!</h3>
+
+    <div class="mt-4">
+        <h4>Informations de l'utilisateur :</h4>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        <p><strong>Type d'utilisateur :</strong> 
+            {% if user.type_utilisateur == 1 %}
+                Admin
+            {% elif user.type_utilisateur == 2 %}
+                Client
+            {% endif %}
+        </p>
+
+        <!-- Si c'est un admin, afficher les détails spécifiques -->
+        {% if detail_admin %}
+            <h5>Détails administrateur :</h5>
+            <p><strong>Date de naissance :</strong> {{ detail_admin.date_naissance }}</p>
+            <p><strong>Adresse :</strong> {{ detail_admin.adresse }}</p>
+            <p><strong>Sexe :</strong> 
+                {% if detail_admin.sexe == 1 %}
+                    Homme
+                {% else %}
+                    Femme
+                {% endif %}
+            </p>
+            <p><strong>Date de début :</strong> {{ detail_admin.date_debut }}</p>
+            {% if detail_admin.date_fin %}
+                <p><strong>Date de fin :</strong> {{ detail_admin.date_fin }}</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Formulaire RIE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">Formulaire de Demande de Financement</h2>
+    <form method="post" action="{% url 'remplir_formulaire' %}">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="raison_sociale" class="form-label">Raison Sociale</label>
+            <input type="text" name="raison_sociale" id="raison_sociale" value="{{ proforma.raison_sociale }}" class="form-control" required>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="contact" class="form-label">Contact de l'Entreprise</label>
+                <input type="text" name="contact" id="contact" value="{{ proforma.contact }}" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="adresse" class="form-label">Adresse de l'Entreprise</label>
+                <input type="text" name="adresse" id="adresse" value="{{ proforma.adresse }}" class="form-control" required>
+            </div>
+        </div>
+
+        <input type="hidden" name="cout_total" value="{{ proforma.cout_total }}">
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" name="email" id="email" value="{{ proforma.email }}" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="effectif" class="form-label">Effectif</label>
+                <input type="number" name="effectif" id="effectif" value="{{ proforma.effectif }}" class="form-control">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="description_projet" class="form-label">Description du Projet</label>
+            <textarea name="description_projet" id="description_projet" class="form-control" rows="4">{{ proforma.description_projet }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Secteur d’activités (du porteur)</label>
+            {% for secteur, label in secteur_choices %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="secteurs" value="{{ secteur }}" id="secteur_{{ forloop.counter }}"
+                        {% if secteur in proforma.secteurs %}checked{% endif %}>
+                    <label class="form-check-label" for="secteur_{{ forloop.counter }}">
+                        {{ label }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="autre_secteur" class="form-label">Préciser Autre Secteur (si sélectionné)</label>
+            <input type="text" name="autre_secteur" id="autre_secteur" value="{{ proforma.autre_secteur }}" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Générer le Formulaire</button>
+    </form>
+</div>
+{% endblock %}

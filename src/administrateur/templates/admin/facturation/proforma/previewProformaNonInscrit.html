@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Aperçu du Proforma{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Aperçu du Proforma</h2>
+    
+    <p><strong>Nom:</strong> {{ proforma.nom }} {{ proforma.prenom }}</p>
+    <p><strong>Entreprise:</strong> {{ proforma.nom_entreprise }}</p>
+    <p><strong>Lieu:</strong> {{ proforma.lieu_formation }}</p>
+    <p><strong>Coût Total:</strong> {{ proforma.cout_total }} Ar</p>
+
+    <h3>Détails des Modules</h3>
+    <ul>
+        {% for module in module_details %}
+        <li>{{ module.module }} - {{ module.quantite }} x {{ module.prix_unitaire }} Ar</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'inscription_proforma_non_inscrit' %}" class="btn btn-warning">Modifier</a>
+    <a href="{% url 'save_proforma_non_inscrit' %}" class="btn btn-success">Enregistrer</a>
+</div>
+{% endblock %}

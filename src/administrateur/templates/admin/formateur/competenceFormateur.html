@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Compétence Formateur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Liste des compétences du formateur : {{ competence_formateur.0.idformateur.nom }}</h2>
+
+    <!-- Table des compétences -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Formation</th>
+                <th>Module</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for competence in competence_formateur %}
+            <tr>
+                <td>{{ competence.idmodule.idformation.formation }}</td>
+                <td>{{ competence.idmodule.module }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">Aucune compétence ajoutée</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Ajouter des compétences -->
+    <h3 class="mt-5">Ajouter Compétences</h3>
+
+    {% if errors %}
+    <div class="alert alert-danger">
+        {% for field, error_list in errors.items %}
+            <p><strong>{{ field }}:</strong> {{ error_list.0 }}</p>
+        {% endfor %}
+    </div>
+    {% elif success_message %}
+    <div class="alert alert-success">
+        <p><strong>{{ success_message }}</strong></p>
+    </div>
+    {% endif %}
+
+    <form action="" method="POST">
+        {% csrf_token %}
+        
+        <div id="competence-container" class="mb-4">
+            <div class="competence-select mb-3">
+                <label for="competence_0" class="form-label">Module</label>
+                <select name="competence_0" id="competence_0" class="form-select" required>
+                    {% for formation in formation %}
+                    <option value="{{formation.id}}">{{ formation }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <button type="button" id="add-competence-btn" class="btn btn-outline-secondary mb-3">Ajouter une autre formation</button>
+        
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </form>
+
+    <!-- JavaScript pour ajouter une nouvelle sélection -->
+    <script>
+        document.getElementById("add-competence-btn").addEventListener("click", function() {
+            var container = document.getElementById("competence-container");
+            var numberOfSelects = container.getElementsByTagName("select").length;
+
+            var newSelect = container.getElementsByClassName("competence-select")[0].cloneNode(true);
+            var newSelectElement = newSelect.getElementsByTagName("select")[0];
+            newSelectElement.name = "competence_" + numberOfSelects;
+            newSelectElement.id = "competence_" + numberOfSelects;
+
+            container.appendChild(newSelect);
+        });
+    </script>
+
+</div>
+{% endblock %}

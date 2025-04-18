@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Créer un Planning{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Créer un planning pour le module : {{ facture_detail.idmodule.module }}</h2>
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="formateur" class="form-label">Formateur</label>
+            <select name="formateur" id="formateur" class="form-control" required>
+                {% for formateur in formateurs %}
+                    <option value="{{ formateur.idformateur.id }}">
+                        {{ formateur.idformateur.nom }} {{ formateur.idformateur.prenom }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="date_formation" class="form-label">Date de formation</label>
+            <input type="date" name="date_formation" id="date_formation" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="heure_debut" class="form-label">Heure de début</label>
+            <input type="time" name="heure_debut" id="heure_debut" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="heure_fin" class="form-label">Heure de fin</label>
+            <input type="time" name="heure_fin" id="heure_fin" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="commentaire" class="form-label">Commentaire</label>
+            <textarea name="commentaire" id="commentaire" class="form-control"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Créer</button>
+    </form>
+</div>
+{% endblock %}

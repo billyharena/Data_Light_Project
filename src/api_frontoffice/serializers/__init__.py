@@ -1,0 +1,7 @@
+from .formationSerializer import FormationSerializer, ModuleSerializer
+
+from .clientSerializer import ClientRegisterSerializer, LoginSerializer, ClientProfileSerializer, ClientProfileUpdateSerializer
+
+from .proformaSerializer import ProformaNonInscritSerializer, ProformaInscritSerializer, CreateProformaNonInscritSerializer, CreateProformaInscritSerializer, ProformaDetailsSerializer
+
+from .planningSerializer import PlanningFormationSerializer, DisponibiliteSerializer

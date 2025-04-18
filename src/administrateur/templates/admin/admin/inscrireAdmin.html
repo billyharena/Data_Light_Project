@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Inscription Admin</h2>
+
+    <form action="{% url 'inscription_admin' %}" method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="admin" class="form-label">Rôle admin</label>
+            <select name="admin" id="admin" class="form-select" required>
+                <option value="" disabled selected>Choisir...</option>
+                <option value="s">Super Admin</option>
+                <option value="a">Admin</option>
+            </select>
+            
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" name="nom" id="nom" class="form-control" required>
+            <div class="invalid-feedback">Veuillez entrer un nom.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" name="prenom" id="prenom" class="form-control" required>
+            <div class="invalid-feedback">Veuillez entrer un prénom.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+            <div class="invalid-feedback">Veuillez entrer une adresse email valide.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="adresse" class="form-label">Adresse</label>
+            <input type="text" name="adresse" id="adresse" class="form-control" required>
+            <div class="invalid-feedback">Veuillez entrer une adresse.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="date_debut" class="form-label">Date début</label>
+            <input type="date" name="date_debut" id="date_debut" class="form-control" required>
+            <div class="invalid-feedback">Veuillez sélectionner une date de début.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="date_naissance" class="form-label">Date de naissance</label>
+            <input type="date" name="date_naissance" id="date_naissance" class="form-control" required>
+            <div class="invalid-feedback">Veuillez sélectionner une date de naissance.</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe</label>
+            <select name="sexe" id="sexe" class="form-select" required>
+                <option value="" disabled selected>Choisir...</option>
+                <option value="h">Homme</option>
+                <option value="f">Femme</option>
+            </select>
+            <div class="invalid-feedback">Veuillez sélectionner le sexe.</div>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Inscrire</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Bootstrap validation script
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %}

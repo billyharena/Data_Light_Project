@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if formation %}Modifier{% else %}Ajouter{% endif %} Formation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">{% if formation %}Modifier{% else %}Ajouter{% endif %} une Formation</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="formation" class="form-label">Nom de la formation</label>
+            <input type="text" name="formation" id="formation" class="form-control" 
+                   value="{{ formation.formation|default:'' }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="img" class="form-label">Image</label>
+            {% if formation and formation.img %}
+                <img src="{{ formation.img.url }}" class="img-thumbnail mb-2" width="200">
+            {% endif %}
+            <input type="file" name="img" id="img" class="form-control" 
+                   {% if not formation %}required{% endif %}>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control" 
+                     rows="4"></textarea>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+                Ajouter
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    CKEDITOR.replace('description', {
+        toolbar: [
+            ['Styles', 'Format'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['Image', 'Table'],
+            ['RemoveFormat', 'Source']
+        ],
+        stylesSet: [
+            { name: 'Heading 1', element: 'h1' },
+            { name: 'Heading 2', element: 'h2' },
+            { name: 'Heading 3', element: 'h3' },
+            { name: 'Paragraph', element: 'p' }
+        ],
+        format_tags: 'h1;h2;h3;p',
+        height: 300
+    });
+</script>
+{% endblock %}

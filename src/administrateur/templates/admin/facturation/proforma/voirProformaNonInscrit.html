@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails Proforma{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-center mb-4">Modifier Proforma non Inscrit</h2>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form action="{% url 'modification_proforma_non_inscrit' id=proforma.id %}" method="post" class="mb-4">
+        {% csrf_token %}
+
+        <div class="card mb-3">
+            <div class="card-header">Informations Générales</div>
+            <div class="card-body">
+                <p><strong>Numéro Proforma :</strong> {{ proforma.id }}</p>
+                <p><strong>Coût Total :</strong> {{ proforma.cout_total }}</p>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" name="nom" id="nom" value="{{ proforma.nom }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="prenom" class="form-label">Prénom</label>
+                        <input type="text" name="prenom" id="prenom" value="{{ proforma.prenom }}" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="nom_entreprise" class="form-label">Nom de l'Entreprise</label>
+                    <input type="text" name="nom_entreprise" id="nom_entreprise" value="{{ proforma.nom_entreprise }}" class="form-control">
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="contact" class="form-label">Contact de l'Entreprise</label>
+                        <input type="text" name="contact" id="contact" value="{{ proforma.contact }}" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="adresse_entreprise" class="form-label">Adresse de l'Entreprise</label>
+                        <input type="text" name="adresse_entreprise" id="adresse_entreprise" value="{{ proforma.adresse_entreprise }}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="nif" class="form-label">NIF</label>
+                        <input type="text" name="nif" id="nif" value="{{ proforma.nif }}" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="stat" class="form-label">STAT</label>
+                        <input type="text" name="stat" id="stat" value="{{ proforma.stat }}" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="rcs" class="form-label">RCS</label>
+                        <input type="text" name="rcs" id="rcs" value="{{ proforma.rcs }}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="num_cnaps" class="form-label">CNAPS</label>
+                    <input type="text" name="num_cnaps" id="num_cnaps" value="{{ proforma.cnaps }}" class="form-control">
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="extra" class="form-label">Région de formation</label>
+                        <select name="extra" id="extra" class="form-select" required onchange="toggleDetails()">
+                            {% for value, label in detail_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="d-none" id="tana-local">
+                    <div class="col-md-6">
+                        <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                        <input type="number" name="nbr_location_pc" id="nbr_location_pc" value="{{ proforma.nbr_location_pc }}" placeholder="{{ proforma.nbr_location_pc }}" class="form-control">
+                    </div>
+                </div>
+                <div class="d-none" id="tana-non-local">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="lieu_formation" class="form-label">Lieu de Formation</label>
+                            <input type="text" name="lieu_formation" id="lieu_formation" value="{{ proforma.lieu_formation }}" placeholder="{{ proforma.lieu_formation }}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                            <input type="number" name="nbr_location_pc" id="nbr_location_pc" value="{{ proforma.nbr_location_pc }}" placeholder="{{ proforma.nbr_location_pc }}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nbr_frais_restauration" class="form-label">Nombre de Restaurations</label>
+                            <input type="number" name="nbr_frais_restauration" id="nbr_frais_restauration" value="{{ proforma.nbr_frais_restauration }}" placeholder="{{ proforma.nbr_frais_restauration }}" class="form-control">
+                        </div>
+                    </div>    
+                </div>
+                <div class="d-none" id="region">
+                    <div class="row mb-3" >
+                        <div class="col-md-6">
+                            <label for="hebergement" class="form-label">Jour Hébergement</label>
+                            <input type="number" name="hebergement" id="hebergement" value="{{ proforma.hebergement }}" placeholder="{{ proforma.hebergement }}" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pu_hebergement" class="form-label">PU Hébergement</label>
+                            <input type="number" name="pu_hebergement" id="pu_hebergement" value="{{ proforma.pu_hebergement }}" placeholder="{{ proforma.pu_hebergement }}" class="form-control">
+                        </div>
+                    </div>
+                </div>    
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Détails Proforma</div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Formation</th>
+                            <th>Module</th>
+                            <th>Quantité</th>
+                            <th>Durée(h)</th>
+                            <th>Nombre de séance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for details in proforma_details %}
+                        <tr>
+                            <td>{{ details.idmodule.idformation.formation }}</td>
+                            <td>{{ details.idmodule.module }}</td>
+                            <td>
+                                <input type="number" name="details[{{ details.id }}][quantite]" value="{{ details.quantite }}" class="form-control">
+                            </td>
+                            <td>
+                                <input type="number" step="0.1" name="details[{{ details.id }}][duree_seance]" value="{{ details.duree_seance }}" placeholder="{{ details.duree_seance }}" class="form-control">
+                            </td>
+                            <td>{{ details.nbr_seance }}</td>
+                            <td>
+                                <a href="{% url 'supprimer_proforma_detail' details.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce détail ?');">
+                                    Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun détail disponible</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
+    </form>
+
+    <form action="{% url 'inscrire_facture_non_inscrit' proforma.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Inscrire Facture</button>
+    </form>
+
+    <form action="{% url 'generer_rie' proforma.id %}" method="get">
+        <button type="submit" class="btn btn-warning">RIE</button>
+    </form>
+
+    <div class="card mt-4">
+        <div class="card-header">Ajouter des Détails</div>
+        <div class="card-body">
+            <form action="{% url 'modification_proforma_non_inscrit' id=proforma.id %}" method="post">
+                {% csrf_token %}
+                <div id="new-details-container">
+                    <div class="detail-item row g-3">
+                        <div class="col-md-4">
+                            <label for="module" class="form-label">Module</label>
+                            <select name="module" class="form-select">
+                                {% for module in modules %}
+                                <option value="{{ module.id }}">{{ module }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quantite" class="form-label">Nombre de personne</label>
+                            <input type="number" name="quantite" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="duree_seance" class="form-label">Durée</label>
+                            <input type="time" name="duree_seance" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="add-new-detail" class="btn btn-secondary mt-3">Ajouter un autre module</button>
+                <button type="submit" class="btn btn-success mt-3">Ajouter les Détails</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDetails() {
+        const extra = document.getElementById('extra').value;
+        const tanaNonLocalFields = document.getElementById('tana-non-local');
+        const regionFields = document.getElementById('region');
+        const tanaLocal = document.getElementById('tana-local')
+
+        // Masquer ou afficher les champs en fonction de la valeur sélectionnée
+        if (extra == 1) {
+            tanaNonLocalFields.classList.add('d-none');
+            regionFields.classList.add('d-none');
+            tanaLocal.classList.remove('d-none')
+        } else if (extra == 2 || extra == 3) {
+            tanaNonLocalFields.classList.remove('d-none');
+            regionFields.classList.add('d-none');
+            tanaLocal.classList.add('d-none')
+        } else {
+            tanaNonLocalFields.classList.add('d-none');
+            regionFields.classList.remove('d-none');
+            tanaLocal.classList.add('d-none')
+        }
+    }
+
+    // Fonction d'initialisation pour réattacher toggleDetails
+    function attachToggleDetailsEvent() {
+        const extraField = document.getElementById('extra');
+        if (extraField) {
+            extraField.addEventListener('change', toggleDetails);
+        }
+    }
+
+    // Initialisation lors du chargement de la page
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleDetails(); // Met à jour les champs en fonction de la valeur initiale
+        attachToggleDetailsEvent(); // Attache l'événement sur #extra
+    });
+
+    // Gestion de l'ajout dynamique de champs
+    document.getElementById('add-new-detail').addEventListener('click', function () {
+        const container = document.getElementById('new-details-container');
+        const detailItem = document.querySelector('.detail-item').cloneNode(true);
+
+        // Réinitialiser les valeurs des champs clonés
+        detailItem.querySelectorAll('input').forEach(input => input.value = '');
+        container.appendChild(detailItem);
+
+        // Réattacher les événements si des éléments comme #extra sont ajoutés
+        attachToggleDetailsEvent();
+    });
+</script>
+
+
+{% endblock %}

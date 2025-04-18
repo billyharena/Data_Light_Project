@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter Module{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Ajouter Module</h1>
+
+    <!-- Affichage des erreurs -->
+    {% if errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, error_list in errors.items %}
+                <li><strong>{{ field }}:</strong> {{ error_list.0 }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Formulaire de création de module -->
+    <form action="{% url 'inscription_module' %}" method="post" enctype="multipart/form-data" class="form-group">
+        {% csrf_token %}
+
+        <!-- Formation -->
+        <div class="mb-3">
+            <label for="formation" class="form-label">Formation</label>
+            <select name="formation" id="formation" class="form-select" required>
+                {% for formation in formation %}
+                    <option value="{{ formation.id }}">{{ formation.formation }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Module -->
+        <div class="mb-3">
+            <label for="module" class="form-label">Module</label>
+            <input type="text" name="module" id="module" class="form-control" required>
+        </div>
+
+        <!-- Image -->
+        <div class="mb-3">
+            <label for="img" class="form-label">Image</label>
+            <input type="file" name="img" id="img" class="form-control">
+        </div>
+
+        <!-- Durée -->
+        <div class="mb-3">
+            <label for="duree" class="form-label">Durée</label>
+            <input type="number" name="duree" id="duree" class="form-control" required>
+        </div>
+
+        <!-- Prix -->
+        <div class="mb-3">
+            <label for="prix" class="form-label">Prix</label>
+            <input type="number" name="prix" id="prix" class="form-control" required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control" 
+                     rows="4"></textarea>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <div class="mb-3 text-center">
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    CKEDITOR.replace('description', {
+        toolbar: [
+            ['Styles', 'Format'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['Image', 'Table'],
+            ['RemoveFormat', 'Source']
+        ],
+        contentsCss: [
+            "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap",
+            "/static/css/custom_ckeditor.css"  // Fichier CSS pour Gotham
+        ],
+        font_names: 'IBM Plex Mono/IBM Plex Mono; Gotham/Gotham; Arial/Arial; Verdana/Verdana;',
+        stylesSet: [
+            { name: 'IBM Plex Mono', element: 'p', attributes: { 'class': 'ibm-plex-mono' } },
+            { name: 'Gotham', element: 'p', attributes: { 'class': 'gotham' } }
+        ],
+        format_tags: 'h1;h2;h3;p',
+        height: 300
+    });
+</script>
+
+{% endblock %}

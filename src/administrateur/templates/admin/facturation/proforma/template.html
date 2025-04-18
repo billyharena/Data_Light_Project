@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Proforma Invoice - Genèse</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-size: 12px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .company-info, .client-info {
+            width: 45%;
+        }
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .totals {
+            text-align: right;
+        }
+        .notes {
+            margin-top: 20px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-info">
+            <strong>Genèse</strong><br>
+            Lot II N 62 B Analamahitsy<br>
+            Antananarivo, 101 Madagascar<br>
+            Tel: 034 22 188 39<br>
+            www.genese.expert
+        </div>
+        <div class="client-info">
+            <strong>AXIAN UNIVERSITY (NEXTA)</strong><br>
+            Bâtiment Ariane 5 B Zone Galaxy Andraharo<br>
+            Antananarivo, 101 Madagascar<br>
+            Contact: Mme Felana RAHOLIDERANTSOA
+        </div>
+    </div>
+
+    <div class="invoice-details">
+        <div>
+            <strong>Numéro de facture:</strong> 273<br>
+            <strong>Date:</strong> 8/11/2024<br>
+            <strong>Date d'expiration:</strong> 8/11/2024
+        </div>
+        <div class="totals">
+            <strong>Total (MGA):</strong> 3 050 000 Ar
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Durée</th>
+                <th>Participant</th>
+                <th>Prix</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Excel 6 - macro & VBA (18h)<br>13-14-15 Mai 2024, Groupe G1</td>
+                <td>Formation</td>
+                <td>2 400 000 Ar</td>
+                <td>800 000 Ar</td>
+            </tr>
+            <tr>
+                <td>Excel 6 - macro & VBA (18h)<br>27-28-30 Mai 2024, Groupe G2</td>
+                <td>Formation</td>
+                <td>5 400 000 Ar</td>
+                <td>2 000 000 Ar</td>
+            </tr>
+            <tr>
+                <td>Location PC</td>
+                <td>4 jours</td>
+                <td>75 000 Ar</td>
+                <td>300 000 Ar</td>
+            </tr>
+            <tr>
+                <td>Frais de transport</td>
+                <td>6 jours</td>
+                <td>35 000 Ar</td>
+                <td>210 000 Ar</td>
+            </tr>
+            <tr>
+                <td>Frais de restauration</td>
+                <td>1 jour</td>
+                <td>20 000 Ar</td>
+                <td>20 000 Ar</td>
+            </tr>
+            <tr>
+                <td colspan="3">Réduction de 10% accordée sur la formation</td>
+                <td>-280 000 Ar</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td><strong>3 050 000 Ar</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="notes">
+        <strong>Informations de paiement:</strong><br>
+        Paiement par chèque ou virement bancaire<br>
+        Banque: BMOI Analamahitsy<br>
+        Compte N°: 00004 00003 04569820101 55<br>
+        <br>
+        <strong>Informations légales:</strong><br>
+        NIF: 3011852706 | STAT: 74908 11 2022 0 05168<br>
+        RCS: 2022A01259 | Carte Fiscale 2024 N°0145064 / DGI-L
+    </div>
+</body>
+</html>

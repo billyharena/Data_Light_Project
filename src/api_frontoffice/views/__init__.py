@@ -1,0 +1,9 @@
+from .formationViewAPI import FormationList,FormationDetail, ModuleList
+
+from .clientViewAPI import ClientRegisterAPIView, ClientProfileAPIView, LoginAPIView, LogoutAPIView, ClientProfileUpdateAPIView
+
+from .proformaViewAPI import CreateProformaNonInscritAPIView, CreateProformaInscritAPIView, ListeProformasInscritAPIView, ProformaDetailsView, ProformaDetailsDeleteView, ProformaViewSet, ConvertProformaToFacture
+
+from .factureViewAPI import FactureInscritAPIView, FactureNonInscritAPIView, ListeFactureInscritAPIView, FactureDetailsView
+
+from .planningViewAPI import DisponibiliteFormateurAPIView, ReservationFormationAPIView, PlanningModuleAPIView, SuggestionCreneauxFormateurAPIView, EnregistrerSuggestionsAPIView

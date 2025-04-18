@@ -1,0 +1,550 @@
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import axios from "axios";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import { ToastContainer, toast } from "react-toastify";
+
+const PlanningFormation = () => {
+  const { moduleId, detailId, factureId } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [moduleDuration, setModuleDuration] = useState(null);
+  const [calendarView, setCalendarView] = useState("timeGridWeek");
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [busyEvents, setBusyEvents] = useState([]);
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [calendarRef, setCalendarRef] = useState(null);
+  const [nextEventId, setNextEventId] = useState(1);
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+
+
+  useEffect(() => {
+    if (selectedMonth && moduleId) {
+      fetchModuleDuration();  // Récupère la durée du module
+      fetchPlanning();        // Charge les créneaux
+    }
+  }, [selectedMonth, moduleId]);
+  
+
+  const fetchModuleDuration = async () => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/planning/${moduleId}/${selectedMonth}/`);
+      setModuleDuration(response.data.duree); // Supposons que `duree` est en heures
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la durée du module", error);
+    }
+  };
+
+  const mergeOverlappingEvents = (events) => {
+    if (events.length === 0) return [];
+  
+    // Trier les événements par heure de début
+    events.sort((a, b) => new Date(a.start) - new Date(b.start));
+  
+    const mergedEvents = [];
+    let lastEvent = { ...events[0] };
+  
+    for (let i = 1; i < events.length; i++) {
+      const currentEvent = events[i];
+  
+      // Vérifie s'il y a un chevauchement
+      if (new Date(currentEvent.start) <= new Date(lastEvent.end)) {
+        // Fusionner en ajustant l'heure de fin au maximum des deux événements
+        lastEvent.end = new Date(Math.max(new Date(lastEvent.end), new Date(currentEvent.end))).toISOString();
+      } else {
+        // Ajouter l'événement fusionné précédent et réinitialiser
+        mergedEvents.push(lastEvent);
+        lastEvent = { ...currentEvent };
+      }
+    }
+  
+    // Ajouter le dernier événement fusionné
+    mergedEvents.push(lastEvent);
+  
+    return mergedEvents;
+  };
+  
+  const fetchPlanning = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/planning/${moduleId}/${selectedMonth}/`);
+      
+      if (!response.data) {
+        console.error("Réponse vide de l'API");
+        setModuleDuration(null);
+        setBusyEvents([]);
+        return;
+      }
+      console.log("Réponse API :", response.data[0].duree_module);
+      // Toujours récupérer la durée, même si aucun formateur n'est dispo
+      setModuleDuration(response.data[0].duree_module || 0); 
+  
+      const formateurs = response.data.formateurs || [];
+  
+      if (formateurs.length > 0) {
+        let allBusyEvents = [];
+        formateurs.forEach(formateur => {
+          const formateurEvents = formateur.indisponibilites.map((formation) => ({
+            start: `${formation.dateFormation}T${formation.heureDebFormation}`,
+            end: `${formation.dateFormation}T${formation.heureFinFormation}`,
+            color: "#ff5252",
+            editable: false,
+            extendedProps: { type: "busy" }
+          }));
+  
+          allBusyEvents = [...allBusyEvents, ...formateurEvents];
+        });
+  
+        const mergedEvents = mergeOverlappingEvents(allBusyEvents);
+        setBusyEvents(mergedEvents);
+      } else {
+        setBusyEvents([]);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement du planning", error);
+      toast.error("Impossible de charger le planning. Veuillez réessayer.");
+      setBusyEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+  // Vérifier si une plage horaire est disponible
+  const isRangeAvailable = useCallback((start, end) => {
+    console.log("Vérification de la plage:", start, end);
+
+    const now = new Date();
+    if (start < now) {
+        console.log("Date dans le passé");
+        return false;
+    }
+
+    const startHour = start.getHours();
+    const endHour = end.getHours();
+    const endMinutes = end.getMinutes();
+
+    // Empêcher un créneau du matin de dépasser 12h
+    if (startHour < 12 && (endHour > 12 || (endHour === 12 && endMinutes > 0))) {
+        console.log("Fin du créneau dépasse 12h");
+        return false;
+    }
+
+    // Empêcher un créneau de l'après-midi de commencer avant 13h
+    if (startHour < 13 && startHour >= 12) {
+        console.log("Le créneau ne peut pas commencer entre 12h et 13h");
+        return false;
+    }
+
+    // Vérifier les heures de bureau (8h-17h)
+    if (startHour < 8 || endHour > 17) {
+        console.log("Hors heures de bureau");
+        return false;
+    }
+
+    // Vérifier s'il y a un chevauchement avec un événement existant
+    for (const event of busyEvents) {
+        const eventStart = new Date(event.start);
+        const eventEnd = new Date(event.end);
+
+        if (start < eventEnd && end > eventStart) {
+            console.log("Chevauchement avec un événement existant");
+            return false;
+        }
+    }
+
+    console.log("Créneau disponible!");
+    return true;
+}, [busyEvents]);
+
+  
+const handleDateClick = (info) => {
+  if (calendarRef) {
+    const calendarApi = calendarRef.getApi();
+    calendarApi.changeView("timeGridWeek", info.date);
+  }
+};
+
+  // Gérer la sélection d'une plage horaire
+  // Gérer la sélection d'une plage horaire
+  const handleDateSelect = (selectInfo) => {
+    const start = selectInfo.start;
+    const end = selectInfo.end;
+    const day = start.getDay();
+  
+    // Vérifications initiales (comme avant)
+    if (day === 0) {
+      toast.error("Impossible de sélectionner un créneau le dimanche.");
+      selectInfo.view.calendar.unselect();
+      return;
+    }
+  
+    if (!isRangeAvailable(start, end)) {
+      toast.error("Cette plage horaire n'est pas disponible.");
+      selectInfo.view.calendar.unselect();
+      return;
+    }
+  
+    const newSlotDuration = (end - start) / (1000 * 60 * 60);
+    if (newSlotDuration < 2) {
+      toast.info("La durée minimale d'un créneau est de 2 heures.");
+      selectInfo.view.calendar.unselect();
+      return;
+    }
+  
+    const currentTotal = selectedSlots.reduce((total, slot) =>
+      total + (new Date(slot.end) - new Date(slot.start)) / (1000 * 60 * 60), 0
+    );
+  
+    if (moduleDuration !== null && ((currentTotal + newSlotDuration) > moduleDuration)) {
+      toast.error(`La durée totale dépasserait la durée requise du module (${moduleDuration}h).`);
+      selectInfo.view.calendar.unselect();
+      return;
+    }
+  
+    // Vérification si le créneau existe déjà
+    const isDuplicate = selectedSlots.some(slot =>
+      slot.start.getTime() === start.getTime() && slot.end.getTime() === end.getTime()
+    );
+  
+    if (isDuplicate) {
+      toast.error("Vous avez déjà sélectionné ce créneaux.");
+      selectInfo.view.calendar.unselect();
+      return;
+    }
+  
+    // Ajout du créneau si toutes les vérifications sont passées (comme avant)
+    const slotId = `slot-${nextEventId}`;
+    setNextEventId(prev => prev + 1);
+  
+    const newEvent = {
+      id: slotId,
+      title: "Ma réservation",
+      start: start,
+      end: end,
+      color: "#4caf50",
+      extendedProps: { type: "selection" }
+    };
+  
+    const calendarApi = selectInfo.view.calendar;
+    calendarApi.addEvent(newEvent);
+  
+    setSelectedSlots(prev => [...prev, newEvent]);
+    selectInfo.view.calendar.unselect();
+  };
+
+
+  const handleEventClick = (clickInfo) => {
+    const event = clickInfo.event;
+    
+    // Si c'est un événement occupé, ne rien faire
+    if (event.extendedProps.type === "busy") {
+      toast.info("Ce créneau est déjà occupé.");
+      return;
+    }
+    
+    // Si c'est une sélection, proposer de la supprimer
+    if (event.extendedProps.type === "selection") {
+      if (window.confirm(`Voulez-vous supprimer cette réservation du ${getFormattedDate(event.start)} ?`)) {
+        event.remove();
+        setSelectedSlots(prev => prev.filter(slot => slot.id !== event.id));
+      }
+    }
+  };
+
+  const handleMonthChange = (e) => {
+    setSelectedMonth(e.target.value);
+    // Réinitialiser la vue du calendrier au premier jour du mois
+    if (calendarRef) {
+      const api = calendarRef.getApi();
+      api.gotoDate(`${e.target.value}-01`);
+    }
+  };
+  const goToPreviousWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() - 7);
+    setCurrentWeekStart(newDate);
+    if (calendarRef) {
+      calendarRef.getApi().gotoDate(newDate);
+    }
+  };
+  
+  const goToNextWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() + 7);
+    setCurrentWeekStart(newDate);
+    if (calendarRef) {
+      calendarRef.getApi().gotoDate(newDate);
+    }
+  };
+  
+  const handleViewChange = (view) => {
+    setCalendarView(view);
+    if (calendarRef) {
+      const api = calendarRef.getApi();
+      api.changeView(view);
+    }
+  };
+
+  const getFormattedDate = (dateStr) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "Date invalide"; // Ajout
+    
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const removeSelectedSlot = (slotId) => {
+    setSelectedSlots(prev => prev.filter(slot => slot.id !== slotId));
+    // Supprimer également du calendrier
+    if (calendarRef) {
+      const calendarApi = calendarRef.getApi();
+      const eventToRemove = calendarApi.getEventById(slotId);
+      if (eventToRemove) {
+        eventToRemove.remove();
+      }
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (selectedSlots.length === 0) {
+      toast.info("Veuillez sélectionner au moins un créneau.");
+      return;
+    }
+
+    const formattedSlots = selectedSlots.map(slot => ({
+      date: new Date(slot.start).toISOString().split('T')[0],
+      heureDebut: new Date(slot.start).toTimeString().slice(0, 5),
+      heureFin: new Date(slot.end).toTimeString().slice(0, 5),
+    }));
+
+    const payload = {
+      moduleId,
+      detailId,
+      factureId,
+      slots: formattedSlots,
+    };
+
+    console.log("Données envoyées :", payload);  // <-- Vérifie ce que tu envoies
+    console.log("📤 Données envoyées :", JSON.stringify(payload, null, 2)); // Voir si `slots` est correct
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/reservations/",
+        payload,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Réponse API :", response.data);
+      toast.success("Créneaux enregistrés avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement des créneaux", error.response);
+      toast.error("Une erreur est survenue lors de l'enregistrement.");
+    }
+};
+
+
+  return (
+    <div className="container mt-4">
+      {/* ICI */} <ToastContainer/>
+      <div className="card shadow-sm">
+        <div className="card-header bg-primary text-white">
+          <h2 className="text-center mb-0">Planning de Formation</h2>
+        </div>
+        <div className="card-body">
+          {/* Contrôles du calendrier */}
+          <div className="row mb-4 align-items-center">
+            {/* Sélecteur de mois */}
+            <div className="col-md-4">
+                <div className="input-group">
+                <span className="input-group-text">Mois</span>
+                <input
+                    type="month"
+                    className="form-control"
+                    value={selectedMonth}
+                    onChange={handleMonthChange}
+                    min={new Date().toISOString().slice(0, 7)}
+                />
+                </div>
+            </div>
+
+            {/* Boutons de navigation semaine */}
+            <div className="col-md-4 d-flex justify-content-center">
+                <button className="btn btn-outline-primary me-2" onClick={goToPreviousWeek}>
+                <i className="bi bi-arrow-left"></i> Semaine précédente
+                </button>
+                <button className="btn btn-outline-primary" onClick={goToNextWeek}>
+                Semaine suivante <i className="bi bi-arrow-right"></i>
+                </button>
+            </div>
+
+            {/* Boutons de vue du calendrier */}
+            <div className="col-md-4">
+                <div className="btn-group w-100">
+                <button
+                    className={`btn ${calendarView === "dayGridMonth" ? "btn-primary" : "btn-outline-primary"}`}
+                    onClick={() => handleViewChange("dayGridMonth")}
+                >
+                    Mois
+                </button>
+                <button
+                    className={`btn ${calendarView === "timeGridWeek" ? "btn-primary" : "btn-outline-primary"}`}
+                    onClick={() => handleViewChange("timeGridWeek")}
+                >
+                    Semaine
+                </button>
+                </div>
+            </div>
+            </div>
+
+
+          {/* Instructions et légende */}
+          <div className="alert alert-info mb-3">
+            <i className="bi bi-info-circle me-2"></i>
+            <strong>Comment réserver :</strong> Cliquez et faites glisser sur le calendrier pour sélectionner une plage horaire. Les horaires disponibles sont de 8h à 12h et de 13h à 17h.
+          </div>
+          
+          <div className="d-flex justify-content-center mb-3">
+            <div className="me-4">
+              <span className="badge bg-success me-1">⬤</span>
+              <span>Ma réservation</span>
+            </div>
+            <div>
+              <span className="badge bg-danger me-1">⬤</span>
+              <span>Déjà occupé</span>
+            </div>
+          </div>
+
+          {/* Calendrier */}
+          <div className="calendar-container">
+            {loading ? (
+              <div className="text-center p-5">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Chargement...</span>
+                </div>
+                <p className="mt-2">Chargement du planning...</p>
+              </div>
+            ) : (
+              <FullCalendar
+                ref={setCalendarRef}
+                plugins={[timeGridPlugin, interactionPlugin, dayGridPlugin]}
+                initialView={calendarView}
+                initialDate={`${selectedMonth}-01`}
+                events={busyEvents}
+                slotMinTime="08:00:00"
+                slotMaxTime="17:00:00"
+                headerToolbar={false}
+                locale="fr"
+                weekends={true}
+                allDaySlot={false}
+                selectable={true}
+                selectMirror={true}
+                select={handleDateSelect}
+                eventClick={handleEventClick}
+                height="auto"
+                slotDuration="00:30:00"
+                snapDuration="00:30:00"
+                businessHours={{
+                  daysOfWeek: [1, 2, 3, 4, 5, 6],
+                  startTime: '08:00',
+                  endTime: '17:00',
+                }}
+                dateClick={handleDateClick}
+                selectAllow={(selectInfo) => {
+                  const day = selectInfo.start.getDay(); // 0 = Dimanche, 1 = Lundi, ..., 6 = Samedi
+                  if (day === 0) {
+                    setTimeout(() => {
+                      toast.error("Impossible de sélectionner un créneau le dimanche.");
+                    }, 100);                    
+                    return false;
+                  }
+                  return isRangeAvailable(selectInfo.start, selectInfo.end);
+                }}
+                
+              />
+            )}
+          </div>
+
+          {/* Liste des créneaux sélectionnés */}
+          <div className="mt-4">
+            <h4 className="mb-3">
+              <i className="bi bi-calendar-check me-2"></i>
+              Mes réservations
+            </h4>
+            {selectedSlots.length > 0 ? (
+              <div className="list-group">
+                {selectedSlots.map((slot) => (
+                  <div key={slot.id} className="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                      <i className="bi bi-clock me-2 text-primary"></i>
+                      {getFormattedDate(slot.start)} à {new Date(slot.end).toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                    <div className="d-flex align-items-center">
+                      <span className="badge bg-primary me-3">
+                        {Math.round((new Date(slot.end) - new Date(slot.start)) / (1000 * 60 * 60) * 2) / 2}h
+                      </span>
+                      <button 
+                        className="btn btn-sm btn-outline-danger" 
+                        onClick={() => removeSelectedSlot(slot.id)}
+                        title="Supprimer cette réservation"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div className="list-group-item bg-light d-flex justify-content-between">
+                  <strong>Total</strong>
+                  <strong>
+                    {selectedSlots.reduce((total, slot) => 
+                      total + (new Date(slot.end) - new Date(slot.start)) / (1000 * 60 * 60), 0
+                    ).toFixed(1)}h
+                  </strong>
+                </div>
+              </div>
+            ) : (
+              <div className="alert alert-info">
+                <i className="bi bi-info-circle me-2"></i>
+                Aucune réservation. Sélectionnez des plages horaires dans le calendrier en cliquant et faisant glisser.
+              </div>
+            )}
+          </div>
+
+          {/* Boutons d'action */}
+          <div className="d-flex justify-content-between mt-4">
+            {/* <Link to="/factures" className="btn btn-secondary">
+              <i className="bi bi-arrow-left me-2"></i>
+              Retour
+            </Link> */}
+            <button 
+              className="btn btn-success" 
+              disabled={selectedSlots.length === 0}
+              onClick={handleSubmit}
+            >
+              <i className="bi bi-check-circle me-2"></i>
+              Valider les créneaux
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* ICI */}
+    </div>
+  );
+};
+
+export default PlanningFormation;

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription Client{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Inscription Client</h2>
+
+    <form action="{% url 'inscription_client' %}" method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" name="nom" id="nom" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" name="prenom" id="prenom" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe</label>
+            <select name="sexe" id="sexe" class="form-select" required>
+                <option value="h">Homme</option>
+                <option value="f">Femme</option>
+            </select>
+        </div>
+
+        <!-- Sélectionner le type de client -->
+        <div class="mb-3">
+            <label for="role_utilisateur" class="form-label">Type de client</label>
+            <select name="role_utilisateur" id="role_utilisateur" class="form-select" required onchange="toggleEntrepriseFields()">
+                <option value="p">Particulier</option>
+                <option value="e">Entreprise</option>
+            </select>
+        </div>
+
+        <!-- Champs spécifiques au Particulier -->
+        <div id="particulier-fields" class="mb-3">
+            <div class="mb-3">
+                <label for="contact" class="form-label">Contact</label>
+                <input type="text" name="contact" id="contact" class="form-control">
+            </div>
+    
+            <div class="mb-3">
+                <label for="cin" class="form-label">CIN</label>
+                <input type="text" name="cin" id="cin" class="form-control">
+            </div>
+        </div>
+
+        <!-- Champs spécifiques à l'Entreprise -->
+        <div id="entreprise-fields" class="d-none">
+            <div class="mb-3">
+                <label for="raison_social" class="form-label">Raison sociale</label>
+                <input type="text" name="raison_social" id="raison_social" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="contact_entreprise" class="form-label">Contact de l'Entreprise</label>
+                <input type="text" name="contact_entreprise" id="contact_entreprise" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="adresse" class="form-label">Adresse</label>
+                <input type="text" name="adresse" id="adresse" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="date_creation_entreprise" class="form-label">Date de création de l'entreprise</label>
+                <input type="date" name="date_creation_entreprise" id="date_creation_entreprise" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="nif" class="form-label">NIF</label>
+                <input type="text" name="nif" id="nif" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="stat" class="form-label">STAT</label>
+                <input type="text" name="stat" id="stat" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="rcs" class="form-label">RCS</label>
+                <input type="text" name="rcs" id="rcs" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="num_cnaps" class="form-label">CNAPS</label>
+                <input type="text" name="num_cnaps" id="num_cnaps" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="effectif" class="form-label">Effectif</label>
+                <input type="number" name="effectif" id="effectif" class="form-control">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Inscrire</button>
+    </form>
+</div>
+
+<script>
+    function toggleEntrepriseFields() {
+        var roleUtilisateur = document.getElementById('role_utilisateur').value;
+        var particulierFields = document.getElementById('particulier-fields');
+        var entrepriseFields = document.getElementById('entreprise-fields');
+
+        if (roleUtilisateur == 'p') {
+            particulierFields.classList.remove('d-none');
+            entrepriseFields.classList.add('d-none');
+        } else {
+            particulierFields.classList.add('d-none');
+            entrepriseFields.classList.remove('d-none');
+        }
+    }
+
+    toggleEntrepriseFields();
+</script>
+
+{% endblock %}

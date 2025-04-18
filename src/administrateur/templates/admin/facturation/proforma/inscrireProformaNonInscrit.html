@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscription Proforma Non Inscrit{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Inscription Proforma Non Inscrit</h1>
+
+    {% if errors %}
+    <div class="alert alert-danger">
+        {% for field, error_list in errors.items %}
+            <p><strong>{{ field }}:</strong> {{ error_list.0 }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form action="{% url 'inscription_proforma_non_inscrit' %}" method="post">
+        {% csrf_token %}
+
+        <!-- Informations sur l'entreprise -->
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" name="nom" id="nom" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" name="prenom" id="prenom" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="nom_entreprise" class="form-label">Nom de l'entreprise</label>
+            <input type="text" name="nom_entreprise" id="nom_entreprise" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="contact" class="form-label">Contact de l'entreprise</label>
+            <input type="text" name="contact" id="contact" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="adresse_entreprise" class="form-label">Adresse de l'entreprise</label>
+            <input type="text" name="adresse_entreprise" id="adresse_entreprise" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="nif" class="form-label">NIF</label>
+            <input type="text" name="nif" id="nif" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="stat" class="form-label">STAT</label>
+            <input type="text" name="stat" id="stat" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="rcs" class="form-label">RCS</label>
+            <input type="text" name="rcs" id="rcs" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="num_cnaps" class="form-label">CNAPS</label>
+            <input type="text" name="num_cnaps" id="num_cnaps" class="form-control" required>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="extra" class="form-label">Région de formation</label>
+                <select name="extra" id="extra" class="form-select" required onchange="toggleDetails()">
+                    {% for value, label in detail_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Informations de formation -->
+        <div class="d-none" id="tana-local">
+            <div class="mb-3">
+                <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                <input type="number" name="nbr_location_pc" id="nbr_location_pc" class="form-control">
+            </div>
+        </div>
+
+        <div class="d-none" id="tana-non-local">
+            <div class="mb-3">
+                <label for="lieu_formation" class="form-label">Lieu de formation</label>
+                <input type="text" name="lieu_formation" id="lieu_formation" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="nbr_location_pc" class="form-label">Nombre de PC</label>
+                <input type="number" name="nbr_location_pc" id="nbr_location_pc" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="nbr_frais_restauration_tnl" class="form-label">Nombre de restaurations</label>
+                <input type="number" name="nbr_frais_restauration" id="nbr_frais_restauration_tnl" class="form-control">
+            </div>
+        </div>
+
+        <div class="d-none" id="region">
+            <div class="mb-3">
+                <label for="lieu_formation" class="form-label">Lieu de formation</label>
+                <input type="text" name="lieu_formation" id="lieu_formation" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="nbr_frais_restauration_region" class="form-label">Nombre de restaurations</label>
+                <input type="number" name="nbr_frais_restauration" id="nbr_frais_restauration_region" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="hebergement" class="form-label">Jour d'hébergement</label>
+                <input type="number" name="hebergement" id="hebergement" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="pu_hebergement" class="form-label">PU hébergement</label>
+                <input type="number" name="pu_hebergement" id="pu_hebergement" class="form-control">
+            </div>
+        </div>
+
+        <!-- Modules et détails -->
+        <h2>Modules et détails</h2>
+        <div id="details-container">
+            <div class="detail-item mb-3">
+                <label for="module" class="form-label">Module</label>
+                <select name="module" class="form-select" required>
+                    {% for module in modules %}
+                        <option value="{{ module.id }}" data-price="{{ module.prix }}">{{ module }}</option>
+                    {% endfor %}
+                </select>
+                <label for="quantite" class="form-label">Nombre de personne</label>
+                <input type="number" name="quantite" class="form-control" required>
+                <label for="duree_seance" class="form-label">Durée (heures)</label>
+                <input type="time" name="duree_seance" class="form-control">
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary" id="add-detail">Ajouter un module</button>
+        <button type="button" class="btn btn-danger" id="delete-detail">Supprimer un module</button>
+
+        <br><br>
+
+        <!-- Preview and Submit Buttons -->
+        <button type="button" class="btn btn-info" id="preview-button">Voir</button>
+        <button type="submit" class="btn btn-primary">Demander Proforma</button>
+    </form>
+
+    <!-- Preview Section -->
+    <div id="preview-section" class="mt-4 d-none">
+        <h2>Preview Proforma</h2>
+        <div class="card">
+            <div class="card-body" id="preview-content">
+                <!-- Preview content will be inserted here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Existing functions for adding/removing modules and toggling details
+    document.getElementById('add-detail').addEventListener('click', function () {
+        const container = document.getElementById('details-container');
+        const detailItem = document.querySelector('.detail-item').cloneNode(true);
+        detailItem.querySelectorAll('input, select').forEach(input => input.value = '');
+        container.appendChild(detailItem);
+    });
+
+    document.getElementById('delete-detail').addEventListener('click', function () {
+        const container = document.getElementById('details-container');
+        const detailItems = container.querySelectorAll('.detail-item');
+        if (detailItems.length > 1) {
+            container.removeChild(detailItems[detailItems.length - 1]);
+        } else {
+            alert('Il doit y avoir au moins un module !');
+        }
+    });
+
+    function toggleDetails() {
+        const extra = document.getElementById('extra').value;
+        document.getElementById('tana-local').classList.toggle('d-none', extra != 1);
+        document.getElementById('tana-non-local').classList.toggle('d-none', extra == 1 || extra == 4);
+        document.getElementById('region').classList.toggle('d-none', extra != 4);
+    }
+
+    // New Preview functionality
+    document.getElementById('preview-button').addEventListener('click', function() {
+        // Gather basic information
+        const formData = {
+            nom: document.getElementById('nom').value,
+            prenom: document.getElementById('prenom').value,
+            entreprise: document.getElementById('nom_entreprise').value,
+            contact: document.getElementById('contact').value,
+            adresse: document.getElementById('adresse_entreprise').value,
+            nif: document.getElementById('nif').value,
+            stat: document.getElementById('stat').value,
+            rcs: document.getElementById('rcs').value,
+            cnaps: document.getElementById('num_cnaps').value,
+            region: document.getElementById('extra').options[document.getElementById('extra').selectedIndex].text
+        };
+
+        // Gather modules information
+        const modules = [];
+        document.querySelectorAll('.detail-item').forEach(item => {
+            const moduleSelect = item.querySelector('select[name="module"]');
+            const module = {
+                name: moduleSelect.options[moduleSelect.selectedIndex].text,
+                quantity: item.querySelector('input[name="quantite"]').value,
+                duration: item.querySelector('input[name="duree_seance"]').value,
+                price: moduleSelect.options[moduleSelect.selectedIndex].dataset.price
+            };
+            modules.push(module);
+        });
+
+        // Gather location-specific information
+        const extra = document.getElementById('extra').value;
+        let locationInfo = '';
+        if (extra === '1') {
+            locationInfo = `
+                <p><strong>Nombre de PC:</strong> ${document.getElementById('nbr_location_pc').value}</p>
+            `;
+        } else if (extra === '4') {
+            locationInfo = `
+                <p><strong>Lieu:</strong> ${document.getElementById('lieu_formation').value}</p>
+                <p><strong>Restauration:</strong> ${document.getElementById('nbr_frais_restauration_region').value}</p>
+                <p><strong>Hébergement:</strong> ${document.getElementById('hebergement').value} jours</p>
+                <p><strong>PU Hébergement:</strong> ${document.getElementById('pu_hebergement').value}</p>
+            `;
+        } else {
+            locationInfo = `
+                <p><strong>Lieu:</strong> ${document.getElementById('lieu_formation').value}</p>
+                <p><strong>Restauration:</strong> ${document.getElementById('nbr_frais_restauration_tnl').value}</p>
+            `;
+        }
+
+        // Build preview HTML
+        let previewHtml = `
+            <h4>Informations Entreprise</h4>
+            <p><strong>Nom:</strong> ${formData.nom}</p>
+            <p><strong>Prénom:</strong> ${formData.prenom}</p>
+            <p><strong>Entreprise:</strong> ${formData.entreprise}</p>
+            <p><strong>Contact:</strong> ${formData.contact}</p>
+            <p><strong>Adresse:</strong> ${formData.adresse}</p>
+            <p><strong>NIF:</strong> ${formData.nif}</p>
+            <p><strong>STAT:</strong> ${formData.stat}</p>
+            <p><strong>RCS:</strong> ${formData.rcs}</p>
+            <p><strong>CNAPS:</strong> ${formData.cnaps}</p>
+            <p><strong>Région:</strong> ${formData.region}</p>
+
+            <h4 class="mt-4">Détails Formation</h4>
+            ${locationInfo}
+
+            <h4 class="mt-4">Modules</h4>
+        `;
+
+        modules.forEach(module => {
+            previewHtml += `
+                <div class="module-item">
+                    <p><strong>${module.name}</strong></p>
+                    <p>Quantité: ${module.quantity}</p>
+                    <p>Durée: ${module.duration} heures</p>
+                    ${module.price ? `<p>Prix unitaire: ${module.price} Ar</p>` : ''}
+                </div>
+                <hr>
+            `;
+        });
+
+        // Calculate and display total if prices are available
+        if (modules.some(m => m.price)) {
+            const total = modules.reduce((sum, m) => {
+                return sum + (m.price * m.quantity);
+            }, 0);
+            previewHtml += `<h4 class="mt-4">Total Estimé: ${total.toFixed(2)} Ar</h4>`;
+        }
+
+        // Insert preview and show section
+        document.getElementById('preview-content').innerHTML = previewHtml;
+        document.getElementById('preview-section').classList.remove('d-none');
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Extra{% endblock %}
+{% block content %}
+    <h1>Extra</h1>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Motif</th>
+                <th>Détails</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for extra in extra %}
+            <tr>
+                <td>{{ extra.get_motif_display }}</td>
+            <td>
+                {% if extra.details %}
+                    {{ extra.get_details_display }}
+                {% endif %}
+            </td>
+                <td>{{ extra.prix }} Ar</td>
+                <td>
+                    <button 
+                        type="button" 
+                        class="btn btn-warning btn-sm" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editModal"
+                        data-id="{{ extra.id }}"
+                        data-motif="{{ extra.motif }}"
+                        data-details="{{ extra.details }}"
+                        data-prix="{{ extra.prix }}"
+                    >
+                        Modifier
+                    </button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Aucun extra</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Stock de PC</h2>
+    <form method="post">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <input type="number" value="{{ stock_pc.stock }}" name="stock" class="form-control">
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-primary">Modifier</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="motif" class="form-label">Motif</label>
+            <select name="motif" id="motif" class="form-select">
+                {% for value, label in motif_choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="details" class="form-label">Détails</label>
+                <select name="details" id="details" class="form-select">
+                    <option value="">---------</option>
+                    {% for value, label in detail_choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="prix" class="form-label">Prix</label>
+                <input type="number" name="prix" id="prix" class="form-control">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+    </form>
+
+    <!-- Modal de modification -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'extra</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="editForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="extra_id" id="extra_id">
+                    
+                    <div class="mb-3">
+                        <label for="edit_motif" class="form-label">Motif</label>
+                        <select name="motif" id="edit_motif" class="form-select">
+                            {% for value, label in motif_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_details" class="form-label">Détails</label>
+                        <select name="details" id="edit_details" class="form-select">
+                            <option value="">---------</option>
+                            {% for value, label in detail_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_prix" class="form-label">Prix</label>
+                        <input type="number" name="prix" id="edit_prix" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var editModal = document.getElementById('editModal');
+        
+        editModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            
+            // Récupère les données
+            var id = button.getAttribute('data-id');
+            var motif = button.getAttribute('data-motif');
+            var details = button.getAttribute('data-details');
+            var prix = button.getAttribute('data-prix').replace(',', '.'); // Gestion des formats
+    
+            // Met à jour le formulaire
+            document.getElementById('extra_id').value = id;
+            document.getElementById('edit_motif').value = motif;
+            document.getElementById('edit_details').value = details || '';
+            document.getElementById('edit_prix').value = prix;
+        });
+    });
+    </script>
+{% endblock %}

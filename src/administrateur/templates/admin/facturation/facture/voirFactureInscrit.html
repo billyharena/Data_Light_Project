@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Détails Proforma{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Affichage des messages -->
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="mb-4">Modifier Proforma Inscrit</h2>
+
+    <!-- Formulaire de paiement -->
+    <form action="{% url 'voir_facture_inscrit' facture_inscrit.id %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="paiement" class="form-label">Payer : </label>
+            <input type="number" name="paiement" id="paiement" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success">Payer</button>
+    </form>
+
+    <!-- Détails du proforma -->
+    <div class="mb-4">
+        <h3>Reste à payer : {{ reste_payer }}</h3>
+        <h3>Numéro proforma : {{ facture_inscrit.id }}</h3>
+        <h3>Coût total : {{ facture_inscrit.cout_total }}</h3>
+        <h3><strong>{{ facture_inscrit.nom }} {{ facture_inscrit.prenom }}</strong></h3>
+        <h3><strong>{{ facture_inscrit.nom_entreprise }}</strong></h3>
+        <p>{{ facture_inscrit.adresse_entreprise }}</p>
+        <p>NIF : {{ facture_inscrit.nif }}</p>
+        <p>Statut : {{ facture_inscrit.stat }}</p>
+        <p>RCS : {{ facture_inscrit.rcs }}</p>
+        <p>CNAPS : {{ facture_inscrit.cnaps }}</p>
+        <p>Lieu de formation : {{ facture_inscrit.lieu_formation }}</p>
+        <p>Nombre de locations PC : {{ facture_inscrit.nbr_location_pc }}</p>
+        <p>Prix unitaire PC : {{ facture_inscrit.pu_pc }}</p>
+        <p>Nombre de frais transport : {{ facture_inscrit.nbr_frais_transport }}</p>
+        <p>Prix unitaire transport : {{ facture_inscrit.pu_transport }}</p>
+        <p>Nombre de frais restauration : {{ facture_inscrit.nbr_frais_restauration }}</p>
+        <p>Prix unitaire restauration : {{ facture_inscrit.pu_restauration }}</p>
+        <p>Hébergement : {{ facture_inscrit.hebergement }}</p>
+        <p>Prix unitaire hébergement : {{ facture_inscrit.pu_hebergement }}</p>
+    </div>
+
+    <!-- Tableau des détails de la facture -->
+    <h3 class="mb-3">Détails de la facture</h3>
+    <table class="table table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Formation</th>
+                <th>Module</th>
+                <th>Quantité</th>
+                <th>Durée</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for details in facture_details %}
+            <tr>
+                <td>{{ details.idmodule.idformation.formation }}</td>
+                <td>{{ details.idmodule.module }}</td>
+                <td>{{ details.quantite }}</td>
+                <td>{{ details.duree_seance }}</td>
+                <td><a href="{% url 'creer_planning' details.id %}" class="btn btn-primary btn-sm">Planning</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">Aucun détail</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

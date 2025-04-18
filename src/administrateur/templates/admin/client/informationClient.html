@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier Formateur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Modifier Formateur</h2>
+
+    <form action="{% url 'modifier_client' id=admin.id %}" method="post">
+        {% csrf_token %}
+        
+        <!-- Informations sur l'utilisateur -->
+        <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input type="text" name="nom" id="nom" class="form-control" value="{{ admin.nom }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input type="text" name="prenom" id="prenom" class="form-control" value="{{ admin.prenom }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" value="{{ admin.email }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="sexe" class="form-label">Sexe</label>
+            <select name="sexe" id="sexe" class="form-select" required>
+                <option value="h" {% if detail_client and detail_client.sexe == 1 %}selected{% endif %}>Homme</option>
+                <option value="f" {% if detail_client and detail_client.sexe == 2 %}selected{% endif %}>Femme</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="role_utilisateur" class="form-label">Type</label>
+            <select name="role_utilisateur" id="role_utilisateur" class="form-select" required onchange="toggleEntrepriseFields()">
+                <option value="p" {% if admin and admin.role_utilisateur == 4 %}selected{% endif %}>Particulier</option>
+                <option value="e" {% if admin and admin.role_utilisateur == 5 %}selected{% endif %}>Entreprise</option>
+            </select>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" name="is_active" id="is_active" class="form-check-input" {% if admin.is_active %}checked{% endif %} value="True">
+            <label for="is_active" class="form-check-label">Actif</label>
+        </div>
+        
+        <!-- Champs communs pour Particulier et Entreprise -->
+    
+        <!-- Champs Particulier -->
+        <div id="particulier-fields" class="mb-3">
+            <div class="mb-3">
+                <label for="contact" class="form-label">Contact</label>
+                <input type="text" name="contact" id="contact" class="form-control" value="{{ detail_client.contact }}">
+            </div>
+    
+            <div class="mb-3">
+                <label for="cin" class="form-label">CIN</label>
+                <input type="text" name="cin" id="cin" class="form-control" value="{{ detail_client.cin }}">
+            </div>
+        </div>
+
+        <!-- Champs Entreprise -->
+        <div id="entreprise-fields" class="d-none">
+            <div class="mb-3">
+                <label for="raison_social" class="form-label">Raison sociale</label>
+                <input type="text" name="raison_social" id="raison_social" class="form-control" value="{{ detail_client.raison_social|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="contact_entreprise" class="form-label">Contact de l'Entreprise</label>
+                <input type="text" name="contact_entreprise" id="contact_entreprise" class="form-control" value="{{ detail_client.contact_entreprise|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="adresse" class="form-label">Adresse</label>
+                <input type="text" name="adresse" id="adresse" class="form-control" value="{{ detail_client.adresse|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="date_creation_entreprise" class="form-label">Date de création de l'entreprise</label>
+                <input type="date" name="date_creation_entreprise" id="date_creation_entreprise" class="form-control" value="{{ detail_client.date_creation_entreprise|date:'Y-m-d'|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="nif" class="form-label">NIF</label>
+                <input type="text" name="nif" id="nif" class="form-control" value="{{ detail_client.nif|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="stat" class="form-label">STAT</label>
+                <input type="text" name="stat" id="stat" class="form-control" value="{{ detail_client.stat|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="rcs" class="form-label">RCS</label>
+                <input type="text" name="rcs" id="rcs" class="form-control" value="{{ detail_client.rcs|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="num_cnaps" class="form-label">CNAPS</label>
+                <input type="text" name="num_cnaps" id="num_cnaps" class="form-control" value="{{ detail_client.num_cnaps|default_if_none:'' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="effectif" class="form-label">Effectif</label>
+                <input type="number" name="effectif" id="effectif" class="form-control" value="{{ detail_client.effectif|default_if_none:'' }}">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Modifier</button>
+    </form>
+</div>
+
+<script>
+    function toggleEntrepriseFields() {
+        var roleUtilisateur = document.getElementById('role_utilisateur').value;
+        var particulierFields = document.getElementById('particulier-fields');
+        var entrepriseFields = document.getElementById('entreprise-fields');
+
+        if (roleUtilisateur == 'p') {
+            particulierFields.classList.remove('d-none');
+            entrepriseFields.classList.add('d-none');
+        } else {
+            particulierFields.classList.add('d-none');
+            entrepriseFields.classList.remove('d-none');
+        }
+    }
+
+    // Appeler la fonction pour définir l'état initial en fonction du rôle existant
+    toggleEntrepriseFields();
+</script>
+
+{% endblock %}
